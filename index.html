@@ -1,88 +1,114 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PhotoText Pro</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f9f9f9;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 20px;
+      background: #f0f2f5;
+      text-align: center;
     }
     h1 {
-      color: #333;
-    }
-    canvas {
-      border: 2px solid #555;
-      margin-top: 10px;
-      max-width: 100%;
+      margin-bottom: 20px;
     }
     .controls {
-      margin-top: 15px;
+      margin-bottom: 15px;
     }
-    input, button, select {
+    input[type="file"], input[type="text"], select, button {
       padding: 10px;
+      font-size: 16px;
       margin: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    .canvas-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>🖼️ PhotoText Pro</h1>
-  <input type="file" id="imageInput" accept="image/*" />
-  <div class="controls">
-    <input type="text" id="textInput" placeholder="Enter your text" />
-    <input type="color" id="textColor" value="#000000" />
-    <input type="number" id="textSize" value="30" min="10" max="100" />
-    <button onclick="addText()">Add Text</button>
-    <button onclick="downloadImage()">Download</button>
-  </div>
-  <canvas id="canvas"></canvas>
-
-  <script>
-    const imageInput = document.getElementById("imageInput");
-    const textInput = document.getElementById("textInput");
-    const textColor = document.getElementById("textColor");
-    const textSize = document.getElementById("textSize");
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-
+  <h1>🖼️ PhotoText Pro Editor</h1>  <div class="controls">
+    <input type="file" id="imageInput" accept="image/*">
+    <br>
+    <input type="text" id="textInput" placeholder="Write text here...">
+    <br>
+    <select id="fontSelect">
+      <option value="Arial">Arial</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Impact">Impact</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Tahoma">Tahoma</option>
+    </select>
+    <input type="color" id="colorInput" value="#ffffff">
+    <input type="color" id="shadowColorInput" value="#000000">
+    <br>
+    <button onclick="drawTextOnImage()">Add Text</button>
+    <button onclick="downloadImage()">Download Image</button>
+  </div>  <div class="canvas-container">
+    <canvas id="canvas"></canvas>
+  </div>  <script>
     let img = new Image();
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
 
-    imageInput.addEventListener("change", function (e) {
+    document.getElementById('imageInput').addEventListener('change', function(e) {
       const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (event) {
-          img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-          };
-          img.src = event.target.result;
-        };
-        reader.readAsDataURL(file);
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        img.onload = function() {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+        }
+        img.src = event.target.result;
       }
+      if (file) reader.readAsDataURL(file);
     });
 
-    function addText() {
-      const text = textInput.value;
-      const size = parseInt(textSize.value);
-      const color = textColor.value;
-      ctx.drawImage(img, 0, 0); // reset image
+    function drawTextOnImage() {
+      const text = document.getElementById('textInput').value;
+      const font = document.getElementById('fontSelect').value;
+      const color = document.getElementById('colorInput').value;
+      const shadowColor = document.getElementById('shadowColorInput').value;
+
+      if (!img.src) return alert("Please upload an image first.");
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+
+      const fontSize = Math.floor(canvas.width / 15);
+      ctx.font = `bold ${fontSize}px ${font}`;
       ctx.fillStyle = color;
-      ctx.font = `${size}px Arial`;
-      ctx.fillText(text, 50, 50); // default position (top-left)
+      ctx.strokeStyle = shadowColor;
+      ctx.lineWidth = 4;
+      ctx.textAlign = 'center';
+      ctx.shadowColor = shadowColor;
+      ctx.shadowBlur = 10;
+
+      const x = canvas.width / 2;
+      const y = canvas.height / 2;
+      ctx.fillText(text, x, y);
     }
 
     function downloadImage() {
-      const link = document.createElement("a");
-      link.download = "photo-text.png";
+      const link = document.createElement('a');
+      link.download = 'edited-photo.png';
       link.href = canvas.toDataURL();
       link.click();
     }
-  </script>
-</body>
+  </script></body>
 </html>

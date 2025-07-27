@@ -3,30 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PhotoText Pro</title>
+  <title>PhotoText Pro - OneClickPost</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
   <style>
     body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
-    .container { max-width: 900px; margin: auto; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-    canvas { border: 1px solid #ccc; border-radius: 10px; }
+    .container { max-width: 900px; margin: auto; padding: 20px; background: white; border-radius: 12px; }
+    canvas { width: 100%; border: 1px solid #ccc; border-radius: 10px; height: auto; }
     .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
     .controls input, .controls select, .controls button { padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
     .controls button { background: #4CAF50; color: white; cursor: pointer; }
-    .controls button:hover { background: #388e3c; }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>🖼️ PhotoText Pro</h2>
     <input type="file" id="imgLoader" accept="image/*" />
-    <br /><br />
-    <canvas id="canvas" width="800" height="600"></canvas>
-
+    <canvas id="canvas"></canvas>
     <div class="controls">
-      <input type="text" id="textInput" placeholder="Type your text here..." />
+      <input type="text" id="textInput" placeholder="Type your text..." />
       <select id="fontSelect">
-        <option value="Poppins">Poppins</option>
+        <option value="Poppins" selected>Poppins</option>
         <option value="Arial">Arial</option>
         <option value="Georgia">Georgia</option>
         <option value="Courier New">Courier New</option>
@@ -41,85 +38,82 @@
       </select>
       <select id="borderStyle">
         <option value="none">No Border</option>
-        <option value="solid">Solid Border</option>
-        <option value="dashed">Dashed Border</option>
+        <option value="solid">Solid</option>
+        <option value="dashed">Dashed</option>
       </select>
       <button onclick="addText()">➕ Add Text</button>
       <button onclick="downloadImage()">⬇️ Download</button>
     </div>
   </div>
-
   <script>
-    const canvas = new fabric.Canvas('canvas');
+    window.addEventListener('load', () => {
+      const canvas = new fabric.Canvas('canvas');
+      canvas.setWidth(window.innerWidth * 0.95);
+      canvas.setHeight(window.innerHeight * 0.6);
 
-    document.getElementById('imgLoader').onchange = function handleImage(e) {
-      const reader = new FileReader();
-      reader.onload = function (f) {
-        const imgObj = new Image();
-        imgObj.src = f.target.result;
-        imgObj.onload = function () {
-          const img = new fabric.Image(imgObj);
-          img.set({
-            scaleX: canvas.width / img.width,
-            scaleY: canvas.height / img.height,
-            selectable: false
-          });
-          canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+      document.getElementById('imgLoader').onchange = e => {
+        const reader = new FileReader();
+        reader.onload = f => {
+          const imgObj = new Image();
+          imgObj.src = f.target.result;
+          imgObj.onload = () => {
+            const img = new fabric.Image(imgObj);
+            img.scaleToWidth(canvas.getWidth());
+            img.scaleToHeight(canvas.getHeight());
+            canvas.clear();
+            canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+          };
         };
+        reader.readAsDataURL(e.target.files[0]);
       };
-      reader.readAsDataURL(e.target.files[0]);
-    };
 
-    function addText() {
-      const txt = document.getElementById('textInput').value;
-      const font = document.getElementById('fontSelect').value;
-      const color = document.getElementById('colorPicker').value;
-      const emoji = document.getElementById('emojiSelect').value;
-      const border = document.getElementById('borderStyle').value;
+      window.addText = () => {
+        const txt = document.getElementById('textInput').value;
+        const font = document.getElementById('fontSelect').value;
+        const color = document.getElementById('colorPicker').value;
+        const emoji = document.getElementById('emojiSelect').value;
+        const border = document.getElementById('borderStyle').value;
+        const full = txt + " " + emoji;
 
-      const fullText = txt + " " + emoji;
+        const text = new fabric.Textbox(full, {
+          left: canvas.getWidth() / 2,
+          top: canvas.getHeight() / 2,
+          fontSize: 40,
+          fontFamily: font,
+          fill: color,
+          shadow: 'rgba(0,0,0,0.4) 2px 2px 5px',
+          textAlign: 'center',
+          stroke: border !== 'none' ? color : '',
+          strokeWidth: border !== 'none' ? 1 : 0,
+          strokeDashArray: border === 'dashed' ? [5, 5] : null
+        });
 
-      const text = new fabric.Textbox(fullText, {
-        left: 200,
-        top: 200,
-        fontSize: 40,
-        fontFamily: font,
-        fill: color,
-        shadow: 'rgba(0,0,0,0.4) 2px 2px 5px',
-        textAlign: 'center',
-        stroke: border !== 'none' ? color : '',
-        strokeWidth: border !== 'none' ? 1 : 0,
-        strokeDashArray: border === 'dashed' ? [5, 5] : null
-      });
+        const bg = new fabric.Rect({
+          width: text.width + 20,
+          height: text.height + 10,
+          fill: 'rgba(0,0,0,0.5)',
+          originX: 'center',
+          originY: 'center',
+          selectable: false
+        });
 
-      // Background rectangle for text
-      const bg = new fabric.Rect({
-        width: text.width + 20,
-        height: text.height + 10,
-        fill: 'rgba(0,0,0,0.5)',
-        originX: 'center',
-        originY: 'center',
-        selectable: false
-      });
+        const group = new fabric.Group([bg, text], {
+          left: canvas.getWidth() / 2,
+          top: canvas.getHeight() / 2
+        });
 
-      const group = new fabric.Group([bg, text], {
-        left: 200,
-        top: 200
-      });
+        canvas.add(group);
+        canvas.setActiveObject(group);
+      };
 
-      canvas.add(group);
-      canvas.setActiveObject(group);
-    }
-
-    function downloadImage() {
-      const dataURL = canvas.toDataURL({
-        format: 'png'
-      });
-      const link = document.createElement('a');
-      link.href = dataURL;
-      link.download = 'PhotoTextPro.png';
-      link.click();
-    }
+      window.downloadImage = () => {
+        const url = canvas.toDataURL({ format: 'png' });
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'PostWithText.png';
+        a.click();
+      };
+    });
   </script>
 </body>
 </html>

@@ -1,181 +1,228 @@
 document.addEventListener('DOMContentLoaded', function() {
     // DOM Elements
-    const imageUpload = document.getElementById('image-upload');
-    const imagePreview = document.getElementById('image-preview');
-    const quoteText = document.getElementById('quote-text');
-    const quoteContent = document.getElementById('quote-content');
-    const authorContent = document.getElementById('author-content');
-    const downloadBtn = document.getElementById('download-btn');
-    const shareBtn = document.getElementById('share-btn');
-    const removeImageBtn = document.getElementById('remove-image');
-    const fileNameDisplay = document.getElementById('file-name');
-    
-    // Control Elements
-    const textColor = document.getElementById('text-color');
-    const bgOpacity = document.getElementById('bg-opacity');
-    const fontFamily = document.getElementById('font-family');
-    const fontSize = document.getElementById('font-size');
-    const textShadow = document.getElementById('text-shadow');
-    const alignButtons = document.querySelectorAll('.align-btn');
-    const presetButtons = document.querySelectorAll('.preset-btn');
-    
-    // Default values
-    let currentImage = null;
-    let currentAlignment = 'center';
-    
+    const elements = {
+        imageUpload: document.getElementById('image-upload'),
+        imagePreview: document.getElementById('image-preview'),
+        quoteText: document.getElementById('quote-text'),
+        quoteContent: document.getElementById('quote-content'),
+        authorContent: document.getElementById('author-content'),
+        downloadBtn: document.getElementById('download-btn'),
+        clearBtn: document.getElementById('clear-btn'),
+        removeImageBtn: document.getElementById('remove-image'),
+        fileNameDisplay: document.getElementById('file-name'),
+        textColor: document.getElementById('text-color'),
+        bgColor: document.getElementById('bg-color'),
+        bgOpacity: document.getElementById('bg-opacity'),
+        fontFamily: document.getElementById('font-family'),
+        fontSize: document.getElementById('font-size'),
+        textShadow: document.getElementById('text-shadow'),
+        textPadding: document.getElementById('text-padding'),
+        alignButtons: document.querySelectorAll('.align-btn'),
+        presetButtons: document.querySelectorAll('.preset-btn')
+    };
+
+    // App State
+    const state = {
+        currentImage: null,
+        currentAlignment: 'center',
+        overlayColor: '#000000'
+    };
+
     // Initialize the app
     function init() {
-        updateTextStyles();
         setupEventListeners();
+        updateTextStyles();
+        updateBackgroundOverlay();
     }
-    
+
     // Set up all event listeners
     function setupEventListeners() {
         // Image upload handling
-        imageUpload.addEventListener('change', handleImageUpload);
-        removeImageBtn.addEventListener('click', removeBackgroundImage);
+        elements.imageUpload.addEventListener('change', handleImageUpload);
+        elements.removeImageBtn.addEventListener('click', removeBackgroundImage);
         
         // Text content handling
-        quoteContent.addEventListener('input', updateQuoteText);
-        authorContent.addEventListener('input', updateAuthorText);
+        elements.quoteContent.addEventListener('input', updateQuoteText);
+        elements.authorContent.addEventListener('input', updateAuthorText);
         
         // Style controls
-        textColor.addEventListener('input', updateTextStyles);
-        bgOpacity.addEventListener('input', updateBackgroundOverlay);
-        fontFamily.addEventListener('change', updateTextStyles);
-        fontSize.addEventListener('input', updateTextStyles);
-        textShadow.addEventListener('input', updateTextStyles);
+        elements.textColor.addEventListener('input', updateTextStyles);
+        elements.bgColor.addEventListener('input', updateBackgroundOverlay);
+        elements.bgOpacity.addEventListener('input', updateBackgroundOverlay);
+        elements.fontFamily.addEventListener('change', updateTextStyles);
+        elements.fontSize.addEventListener('input', updateTextStyles);
+        elements.textShadow.addEventListener('input', updateTextStyles);
+        elements.textPadding.addEventListener('input', updateTextStyles);
         
         // Alignment buttons
-        alignButtons.forEach(btn => {
+        elements.alignButtons.forEach(btn => {
             btn.addEventListener('click', function() {
                 setAlignment(this.dataset.align);
             });
         });
         
         // Preset buttons
-        presetButtons.forEach(btn => {
+        elements.presetButtons.forEach(btn => {
             btn.addEventListener('click', function() {
                 applyPreset(this.dataset.preset);
             });
         });
         
-        // Download button
-        downloadBtn.addEventListener('click', downloadImage);
-        
-        // Share button (placeholder for future functionality)
-        shareBtn.addEventListener('click', function() {
-            alert('Share functionality will be added in a future update!');
-        });
+        // Action buttons
+        elements.downloadBtn.addEventListener('click', downloadImage);
+        elements.clearBtn.addEventListener('click', resetAll);
     }
-    
+
     // Handle image upload
     function handleImageUpload(e) {
         const file = e.target.files[0];
         if (file) {
-            currentImage = file;
-            fileNameDisplay.textContent = file.name;
-            removeImageBtn.disabled = false;
+            state.currentImage = file;
+            elements.fileNameDisplay.textContent = file.name;
+            elements.removeImageBtn.disabled = false;
             
             const reader = new FileReader();
             reader.onload = function(event) {
-                imagePreview.style.backgroundImage = `url('${event.target.result}')`;
-                imagePreview.dataset.imageLoaded = 'true';
+                elements.imagePreview.style.backgroundImage = `url('${event.target.result}')`;
+                elements.imagePreview.dataset.imageLoaded = 'true';
             };
             reader.readAsDataURL(file);
         }
     }
-    
+
     // Remove background image
     function removeBackgroundImage() {
-        imagePreview.style.backgroundImage = 'none';
-        imagePreview.dataset.imageLoaded = 'false';
-        currentImage = null;
-        fileNameDisplay.textContent = 'No file selected';
-        removeImageBtn.disabled = true;
+        elements.imagePreview.style.backgroundImage = 'none';
+        elements.imagePreview.dataset.imageLoaded = 'false';
+        state.currentImage = null;
+        elements.fileNameDisplay.textContent = 'No file selected';
+        elements.removeImageBtn.disabled = true;
+        elements.imageUpload.value = '';
     }
-    
+
     // Update quote text
     function updateQuoteText() {
-        quoteText.textContent = quoteContent.value || 'Type your inspirational quote here...';
+        elements.quoteText.textContent = elements.quoteContent.value || 'Type your quote here...';
     }
-    
+
     // Update author text
     function updateAuthorText() {
-        quoteText.dataset.author = authorContent.value ? `— ${authorContent.value}` : '';
+        elements.quoteText.dataset.author = elements.authorContent.value ? `— ${elements.authorContent.value}` : '';
     }
-    
+
     // Update all text styles
     function updateTextStyles() {
-        quoteText.style.color = textColor.value;
-        quoteText.style.fontFamily = fontFamily.value;
-        quoteText.style.fontSize = `${fontSize.value}px`;
-        quoteText.style.textShadow = `0 ${textShadow.value}px ${textShadow.value * 1.5}px rgba(0, 0, 0, 0.5)`;
-        quoteText.style.textAlign = currentAlignment;
+        elements.quoteText.style.color = elements.textColor.value;
+        elements.quoteText.style.fontFamily = elements.fontFamily.value;
+        elements.quoteText.style.fontSize = `${elements.fontSize.value}px`;
+        elements.quoteText.style.textShadow = `0 ${elements.textShadow.value}px ${elements.textShadow.value * 1.5}px rgba(0, 0, 0, 0.5)`;
+        elements.quoteText.style.textAlign = state.currentAlignment;
+        elements.quoteText.style.padding = `${elements.textPadding.value}px`;
     }
-    
+
     // Update background overlay
     function updateBackgroundOverlay() {
-        const opacity = bgOpacity.value / 100;
-        imagePreview.style.setProperty('--overlay-opacity', opacity);
+        state.overlayColor = elements.bgColor.value;
+        const opacity = elements.bgOpacity.value / 100;
+        
+        // Create the overlay with updated color and opacity
+        elements.imagePreview.style.setProperty('--overlay-color', state.overlayColor);
+        elements.imagePreview.style.setProperty('--overlay-opacity', opacity);
     }
-    
+
     // Set text alignment
     function setAlignment(alignment) {
-        currentAlignment = alignment;
-        quoteText.style.textAlign = alignment;
+        state.currentAlignment = alignment;
+        elements.quoteText.style.textAlign = alignment;
         
         // Update active state of alignment buttons
-        alignButtons.forEach(btn => {
+        elements.alignButtons.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.align === alignment);
         });
     }
-    
+
     // Apply preset styles
     function applyPreset(preset) {
         switch(preset) {
             case 'light':
-                textColor.value = '#ffffff';
-                bgOpacity.value = 40;
-                fontFamily.value = "'Playfair Display', serif";
-                textShadow.value = 4;
+                elements.textColor.value = '#ffffff';
+                elements.bgColor.value = '#000000';
+                elements.bgOpacity.value = 40;
+                elements.fontFamily.value = "'Playfair Display', serif";
+                elements.textShadow.value = 4;
                 break;
             case 'dark':
-                textColor.value = '#212529';
-                bgOpacity.value = 10;
-                fontFamily.value = "'Montserrat', sans-serif";
-                textShadow.value = 1;
+                elements.textColor.value = '#2d3436';
+                elements.bgColor.value = '#ffffff';
+                elements.bgOpacity.value = 20;
+                elements.fontFamily.value = "'Montserrat', sans-serif";
+                elements.textShadow.value = 1;
                 break;
-            case 'modern':
-                textColor.value = '#ffffff';
-                bgOpacity.value = 70;
-                fontFamily.value = "'Montserrat', sans-serif";
-                textShadow.value = 2;
-                fontSize.value = 28;
+            case 'vibrant':
+                elements.textColor.value = '#ffffff';
+                elements.bgColor.value = '#6c5ce7';
+                elements.bgOpacity.value = 60;
+                elements.fontFamily.value = "'Pacifico', cursive";
+                elements.textShadow.value = 3;
+                break;
+            case 'pastel':
+                elements.textColor.value = '#2d3436';
+                elements.bgColor.value = '#a8e6cf';
+                elements.bgOpacity.value = 50;
+                elements.fontFamily.value = "'Montserrat', sans-serif";
+                elements.textShadow.value = 2;
                 break;
         }
         
         updateTextStyles();
         updateBackgroundOverlay();
     }
-    
+
+    // Reset all settings
+    function resetAll() {
+        // Reset form elements
+        elements.quoteContent.value = '';
+        elements.authorContent.value = '';
+        elements.textColor.value = '#ffffff';
+        elements.bgColor.value = '#000000';
+        elements.bgOpacity.value = 40;
+        elements.fontFamily.value = "'Playfair Display', serif";
+        elements.fontSize.value = 32;
+        elements.textShadow.value = 3;
+        elements.textPadding.value = 40;
+        
+        // Reset image
+        removeBackgroundImage();
+        
+        // Reset alignment
+        setAlignment('center');
+        
+        // Update UI
+        updateQuoteText();
+        updateAuthorText();
+        updateTextStyles();
+        updateBackgroundOverlay();
+    }
+
     // Download the generated image
     function downloadImage() {
-        if (!imagePreview.dataset.imageLoaded || imagePreview.dataset.imageLoaded === 'false') {
+        if (!elements.imagePreview.dataset.imageLoaded || elements.imagePreview.dataset.imageLoaded === 'false') {
             alert('Please upload a background image first!');
             return;
         }
         
         // Show loading state
-        downloadBtn.disabled = true;
-        downloadBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Generating...';
+        const originalBtnText = elements.downloadBtn.innerHTML;
+        elements.downloadBtn.disabled = true;
+        elements.downloadBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Generating...';
         
         // Create a temporary clone for better rendering
-        const clone = imagePreview.cloneNode(true);
+        const clone = elements.imagePreview.cloneNode(true);
         clone.style.width = '1200px';
-        clone.style.height = '630px'; // Ideal for social media
+        clone.style.height = '630px';
         clone.style.padding = '0';
         clone.style.margin = '0';
+        clone.style.borderRadius = '0';
         document.body.appendChild(clone);
         
         // Use html2canvas to capture the image
@@ -198,8 +245,8 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.removeChild(clone);
             
             // Reset button state
-            downloadBtn.disabled = false;
-            downloadBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Image';
+            elements.downloadBtn.disabled = false;
+            elements.downloadBtn.innerHTML = originalBtnText;
         }).catch(err => {
             console.error('Error generating image:', err);
             alert('Error generating image. Please try again.');
@@ -208,11 +255,11 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.removeChild(clone);
             
             // Reset button state
-            downloadBtn.disabled = false;
-            downloadBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Image';
+            elements.downloadBtn.disabled = false;
+            elements.downloadBtn.innerHTML = originalBtnText;
         });
     }
-    
+
     // Initialize the application
     init();
 });

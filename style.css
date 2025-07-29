@@ -37,11 +37,19 @@ h1 {
     gap: 10px;
 }
 
-#image-upload {
+.upload-label {
     flex: 1;
     padding: 10px;
     border: 1px dashed #ccc;
     border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.upload-label input {
+    display: none;
 }
 
 #remove-btn {
@@ -72,8 +80,7 @@ h1 {
     justify-content: center;
 }
 
-.image-preview::after {
-    content: '';
+.overlay {
     position: absolute;
     top: 0;
     left: 0;

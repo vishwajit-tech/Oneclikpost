@@ -2,9 +2,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get DOM elements
     const imageUpload = document.getElementById('image-upload');
     const imagePreview = document.getElementById('image-preview');
+    const overlay = document.getElementById('overlay');
     const quoteText = document.getElementById('quote-text');
     const removeBtn = document.getElementById('remove-btn');
     const downloadBtn = document.getElementById('download-btn');
+    const fileLabel = document.getElementById('file-label');
     
     // Control elements
     const textColor = document.getElementById('text-color');
@@ -17,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     imageUpload.addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
+            fileLabel.textContent = file.name;
             const reader = new FileReader();
             reader.onload = function(event) {
                 imagePreview.style.backgroundImage = `url('${event.target.result}')`;
@@ -29,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     removeBtn.addEventListener('click', function() {
         imagePreview.style.backgroundImage = 'none';
         imageUpload.value = '';
+        fileLabel.textContent = 'Choose Background Image';
     });
     
     // Update text styles
@@ -40,24 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update overlay
         const opacity = bgOpacity.value / 100;
         const rgbaColor = hexToRgba(bgColor.value, opacity);
-        imagePreview.querySelector('::after')?.remove();
-        
-        const overlay = document.createElement('div');
-        overlay.style.position = 'absolute';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.right = '0';
-        overlay.style.bottom = '0';
         overlay.style.backgroundColor = rgbaColor;
-        overlay.style.zIndex = '1';
-        
-        const existingOverlay = imagePreview.querySelector('.overlay');
-        if (existingOverlay) {
-            existingOverlay.remove();
-        }
-        
-        overlay.classList.add('overlay');
-        imagePreview.appendChild(overlay);
     }
     
     // Helper function to convert hex to rgba
@@ -89,20 +76,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Download image
     downloadBtn.addEventListener('click', function() {
-        // Temporarily hide controls for clean screenshot
-        const controls = document.querySelector('.controls');
-        const originalDisplay = controls.style.display;
-        controls.style.display = 'none';
-        
         html2canvas(imagePreview, {
             backgroundColor: null,
             scale: 2,
-            logging: false
+            logging: false,
+            useCORS: true
         }).then(canvas => {
-            // Restore controls
-            controls.style.display = originalDisplay;
-            
-            // Create download link
             const link = document.createElement('a');
             link.download = 'quote-image.png';
             link.href = canvas.toDataURL('image/png');

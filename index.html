@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Quote Image Generator</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Playfair+Display:wght@700&display=swap">
+    <title>Advanced Quote Image Generator</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Playfair+Display:wght@700&family=Pacifico&display=swap">
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>📜 Professional Quote Image Generator</h1>
-            <p class="subtitle">Create stunning social media visuals with your favorite quotes</p>
+            <h1>🎨 Advanced Quote Image Generator</h1>
+            <p class="subtitle">Create beautiful social media visuals with custom colors</p>
         </header>
         
         <div class="app-container">
@@ -39,16 +39,16 @@
             <div class="editor-container">
                 <div class="image-editor card">
                     <div class="image-preview" id="image-preview">
-                        <div class="quote-text" id="quote-text" contenteditable="true">Type your inspirational quote here...</div>
+                        <div class="quote-text" id="quote-text" contenteditable="true">Type your quote here...</div>
                     </div>
                 </div>
                 
                 <div class="controls card">
-                    <h3>Text Customization</h3>
+                    <h3>Customization Options</h3>
                     
                     <div class="control-group">
                         <label for="quote-content">Quote Text</label>
-                        <textarea id="quote-content" placeholder="Enter your quote here..."></textarea>
+                        <textarea id="quote-content" placeholder="Enter your inspirational quote..."></textarea>
                     </div>
                     
                     <div class="control-group">
@@ -56,14 +56,19 @@
                         <input type="text" id="author-content" placeholder="Author name">
                     </div>
                     
-                    <div class="control-row">
+                    <div class="color-options">
                         <div class="control-group">
                             <label for="text-color">Text Color</label>
                             <input type="color" id="text-color" value="#ffffff">
                         </div>
                         
                         <div class="control-group">
-                            <label for="bg-opacity">Background Overlay</label>
+                            <label for="bg-color">Overlay Color</label>
+                            <input type="color" id="bg-color" value="#000000">
+                        </div>
+                        
+                        <div class="control-group">
+                            <label for="bg-opacity">Overlay Opacity</label>
                             <input type="range" id="bg-opacity" min="0" max="100" value="40">
                         </div>
                     </div>
@@ -74,9 +79,9 @@
                             <select id="font-family">
                                 <option value="'Playfair Display', serif">Playfair Display</option>
                                 <option value="'Montserrat', sans-serif">Montserrat</option>
+                                <option value="'Pacifico', cursive">Pacifico</option>
                                 <option value="Arial, sans-serif">Arial</option>
                                 <option value="Georgia, serif">Georgia</option>
-                                <option value="'Courier New', monospace">Courier New</option>
                             </select>
                         </div>
                         
@@ -87,7 +92,7 @@
                     </div>
                     
                     <div class="control-group">
-                        <label for="text-align">Text Alignment</label>
+                        <label>Text Alignment</label>
                         <div class="alignment-options">
                             <button data-align="left" class="align-btn">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -113,17 +118,25 @@
                         </div>
                     </div>
                     
-                    <div class="control-group">
-                        <label for="text-shadow">Text Shadow</label>
-                        <input type="range" id="text-shadow" min="0" max="10" value="3">
+                    <div class="control-row">
+                        <div class="control-group">
+                            <label for="text-shadow">Text Shadow</label>
+                            <input type="range" id="text-shadow" min="0" max="10" value="3">
+                        </div>
+                        
+                        <div class="control-group">
+                            <label for="text-padding">Text Padding</label>
+                            <input type="range" id="text-padding" min="10" max="100" value="40">
+                        </div>
                     </div>
                     
                     <div class="presets">
-                        <h4>Quick Presets:</h4>
+                        <h4>Color Presets:</h4>
                         <div class="preset-options">
-                            <button data-preset="light" class="preset-btn">Light Text</button>
-                            <button data-preset="dark" class="preset-btn">Dark Text</button>
-                            <button data-preset="modern" class="preset-btn">Modern</button>
+                            <button data-preset="light" class="preset-btn">Light Theme</button>
+                            <button data-preset="dark" class="preset-btn">Dark Theme</button>
+                            <button data-preset="vibrant" class="preset-btn">Vibrant</button>
+                            <button data-preset="pastel" class="preset-btn">Pastel</button>
                         </div>
                     </div>
                 </div>
@@ -138,15 +151,12 @@
                     </svg>
                     Download Image
                 </button>
-                <button id="share-btn" class="btn-secondary" disabled>
+                <button id="clear-btn" class="btn-secondary">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <circle cx="18" cy="5" r="3"></circle>
-                        <circle cx="6" cy="12" r="3"></circle>
-                        <circle cx="18" cy="19" r="3"></circle>
-                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                     </svg>
-                    Share
+                    Reset All
                 </button>
             </div>
         </div>

@@ -1,114 +1,55 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PhotoText Pro</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: #f0f2f5;
-      text-align: center;
-    }
-    h1 {
-      margin-bottom: 20px;
-    }
-    .controls {
-      margin-bottom: 15px;
-    }
-    input[type="file"], input[type="text"], select, button {
-      padding: 10px;
-      font-size: 16px;
-      margin: 5px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    canvas {
-      max-width: 100%;
-      height: auto;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    }
-    .canvas-container {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Quote Image Generator</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>🖼️ PhotoText Pro Editor</h1>  <div class="controls">
-    <input type="file" id="imageInput" accept="image/*">
-    <br>
-    <input type="text" id="textInput" placeholder="Write text here...">
-    <br>
-    <select id="fontSelect">
-      <option value="Arial">Arial</option>
-      <option value="Georgia">Georgia</option>
-      <option value="Impact">Impact</option>
-      <option value="Courier New">Courier New</option>
-      <option value="Tahoma">Tahoma</option>
-    </select>
-    <input type="color" id="colorInput" value="#ffffff">
-    <input type="color" id="shadowColorInput" value="#000000">
-    <br>
-    <button onclick="drawTextOnImage()">Add Text</button>
-    <button onclick="downloadImage()">Download Image</button>
-  </div>  <div class="canvas-container">
-    <canvas id="canvas"></canvas>
-  </div>  <script>
-    let img = new Image();
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-
-    document.getElementById('imageInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        img.onload = function() {
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
-        }
-        img.src = event.target.result;
-      }
-      if (file) reader.readAsDataURL(file);
-    });
-
-    function drawTextOnImage() {
-      const text = document.getElementById('textInput').value;
-      const font = document.getElementById('fontSelect').value;
-      const color = document.getElementById('colorInput').value;
-      const shadowColor = document.getElementById('shadowColorInput').value;
-
-      if (!img.src) return alert("Please upload an image first.");
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-
-      const fontSize = Math.floor(canvas.width / 15);
-      ctx.font = `bold ${fontSize}px ${font}`;
-      ctx.fillStyle = color;
-      ctx.strokeStyle = shadowColor;
-      ctx.lineWidth = 4;
-      ctx.textAlign = 'center';
-      ctx.shadowColor = shadowColor;
-      ctx.shadowBlur = 10;
-
-      const x = canvas.width / 2;
-      const y = canvas.height / 2;
-      ctx.fillText(text, x, y);
-    }
-
-    function downloadImage() {
-      const link = document.createElement('a');
-      link.download = 'edited-photo.png';
-      link.href = canvas.toDataURL();
-      link.click();
-    }
-  </script></body>
+    <div class="container">
+        <h1>Professional Quote Image Generator</h1>
+        
+        <div class="upload-section">
+            <input type="file" id="image-upload" accept="image/*">
+            <button id="generate-btn">Generate Quote Image</button>
+        </div>
+        
+        <div class="editor">
+            <div class="image-preview" id="image-preview">
+                <div class="quote-text" id="quote-text" contenteditable="true">Type your quote here...</div>
+            </div>
+            
+            <div class="controls">
+                <label for="text-color">Text Color:</label>
+                <input type="color" id="text-color" value="#ffffff">
+                
+                <label for="font-family">Font:</label>
+                <select id="font-family">
+                    <option value="Arial">Arial</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Georgia">Georgia</option>
+                </select>
+                
+                <label for="font-size">Font Size:</label>
+                <input type="range" id="font-size" min="10" max="72" value="24">
+                
+                <label for="text-align">Text Alignment:</label>
+                <select id="text-align">
+                    <option value="left">Left</option>
+                    <option value="center" selected>Center</option>
+                    <option value="right">Right</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="download-section">
+            <button id="download-btn">Download Image</button>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
 </html>
